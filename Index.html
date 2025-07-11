@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice Generator</title>
+  <link rel="stylesheet" href="./Index.css" />
+    <script src="./Index.js"></script>
+
+</head>
+<body>
+  <div class="invoice-box">
+    <div class="header">
+      <div>
+        <img src="./Assets/Sellerfly.png" alt="Logo" />
+        <div class="company-details">
+          Sf.No.434, Shedukarar Street, Ellapalayam,<br>
+          Coimbatore, Mettupalayam,<br>
+          Mettupalayam - 641697<br>
+          TAMILNADU, INDIA<br>
+          Email: senthil.sellerfly@gmail.com<br>
+          Mobile: 6381780309<br>
+          GSTIN: 33AFNFS0333L1ZV
+        </div>
+      </div>
+      <div class="invoice-title">
+        <h2>INVOICE</h2>
+        <p>Number: <input type="text" id="invoiceNumber"></p>
+
+        <p>Date: <input type="date"></p>
+        <p>Due Date: <input type="date"></p>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 20px;">
+  <div style="flex: 1;">
+    <h3>Customer</h3>
+    <input type="text" placeholder="Customer Name">
+  </div>
+  <div style="flex: 1;">
+    <h3>Billing Address</h3>
+    <textarea rows="3" placeholder="Billing Address"></textarea>
+  </div>
+  <div style="flex: 1;">
+    <h3>Shipping Address</h3>
+    <textarea rows="3" placeholder="Shipping Address"></textarea>
+  </div>
+</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>S.No.</th>
+          <th>Description</th>
+          <th>Rate</th>
+          <th>Quantity</th>
+          <th>Taxable</th>
+          <th>GST 5%</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><input type="text" value="E-COMMERCE ACCOUNT MANAGEMENT SERVICES"></td>
+          <td><input type="number" value="15000"></td>
+          <td><input type="number" value="1"></td>
+          <td>15000</td>
+          <td>750</td>
+          <td>15750</td>
+        </tr>
+        <!-- Add more rows as needed -->
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <div>
+        <p><strong>Bank Name:</strong> SOUTH INDIAN BANK</p>
+        <p><strong>Account Name:</strong> SKSY SELLERFLY ONLINE SOLUTIONS LLP</p>
+        <p><strong>Account Number:</strong> 0753073000000635</p>
+        <p><strong>IFSC Code:</strong> SIBL0000753</p>
+      </div>
+      <div class="totals-right">
+        <p>Taxable INR 15,000.00</p>
+        <p>IGST INR 750.00</p>
+        <p><strong>Total INR 15,750.00</strong></p>
+      </div>
+    </div>
+
+    <div class="amount-in-words">
+      Total in Words: Indian Rupee Fifteen Thousand Seven Hundred Fifty Only
+    </div>
+
+    <div class="signatory">
+      For SKSY SELLERFLY ONLINE SOLUTIONS LLP<br><br>
+      Authorised Signatory
+    </div>
+
+    <div class="footer">
+      Thank you for your business.
+    </div>
+  </div>
+</body>
+</html>

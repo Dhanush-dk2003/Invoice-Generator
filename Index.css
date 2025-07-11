@@ -1,0 +1,100 @@
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      color: #333;
+    }
+    .invoice-box {
+      max-width: 800px;
+      margin: auto;
+      border: 1px solid #eee;
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .header img {
+      max-width: 120px;
+    }
+    .company-details {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .invoice-title {
+      text-align: right;
+       margin-top: 10px; 
+    }
+    .invoice-title h3 {
+      margin: 0;
+    }
+    .invoice-title #invoiceDate {
+      padding-right: 75px;
+      
+      
+    }
+    .invoice-title #invoiceDueDate {
+      padding-right: 40px;
+    }
+    .invoice-title input[type="text"],
+.invoice-title input[type="date"] {
+  border: none; 
+  background: transparent;
+  font-size: 14px;
+  width: auto;
+  padding: 0;
+}
+  
+
+
+    .section {
+      margin-top: 20px;
+    }
+    .section h3 {
+      margin-bottom: 5px;
+    }
+    .section textarea,
+    .section input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+    }
+    .totals {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .totals-right {
+      text-align: right;
+    }
+    .amount-in-words {
+      border-top: 1px solid #ddd;
+      margin-top: 10px;
+      padding-top: 10px;
+      font-style: italic;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .signatory {
+      margin-top: 40px;
+      text-align: right;
+    }
+ 
