@@ -2,18 +2,116 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Invoice Generator</title>
-  <link rel="stylesheet" href="./Index.css" />
-    <script src="./Index.js"></script>
-
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      color: #333;
+    }
+    .invoice-box {
+      max-width: 800px;
+      margin: auto;
+      border: 1px solid #eee;
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .header img {
+      max-width: 120px;
+    }
+    .company-details {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .invoice-title h3 {
+      margin: 0;
+    }
+    .invoice-fields {
+      display: flex;
+      gap: 20px;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .invoice-fields label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .invoice-fields input {
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      width: 140px;
+      border-bottom: 1px solid #ccc;
+      padding: 2px;
+    }
+    textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      resize: vertical;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+    }
+    .totals {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .totals-right {
+      text-align: right;
+    }
+    .amount-in-words {
+      border-top: 1px solid #ddd;
+      margin-top: 10px;
+      padding-top: 10px;
+      font-style: italic;
+    }
+    .signatory {
+      margin-top: 80px;
+      text-align: right;
+    }
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 12px;
+    }
+    hr {
+      margin: 20px 0;
+    }
+    .btn-add {
+      margin-top: 10px;
+    }
+    .btn-download {
+      margin-top: 20px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
-  <div class="invoice-box">
+  <div class="invoice-box" id="invoice">
     <div class="header">
       <div>
         <img src="./Assets/Sellerfly.png" alt="Logo" />
         <div class="company-details">
+          <h4>SKSY SELLERFLY ONLINE SOLUTIONS LLP</h4>
           Sf.No.434, Shedukarar Street, Ellapalayam,<br>
           Coimbatore, Mettupalayam,<br>
           Mettupalayam - 641697<br>
@@ -23,29 +121,32 @@
           GSTIN: 33AFNFS0333L1ZV
         </div>
       </div>
-      <div class="invoice-title">
-        <h2>INVOICE</h2>
-        <p>Number: <input type="text" id="invoiceNumber"></p>
-
-        <p>Date: <input type="date"></p>
-        <p>Due Date: <input type="date"></p>
+      <div>
+        <h3>INVOICE</h3>
+        <div class="invoice-fields">
+          <label>Number: <input type="text" id="invoiceNumber" readonly></label>
+          <label>Date: <input type="date" id="invoiceDate"></label>
+          <label>Due Date: <input type="date" id="invoiceDueDate"></label>
+        </div>
       </div>
     </div>
 
+    <hr>
+
     <div style="display: flex; gap: 20px;">
-  <div style="flex: 1;">
-    <h3>Customer</h3>
-    <input type="text" placeholder="Customer Name">
-  </div>
-  <div style="flex: 1;">
-    <h3>Billing Address</h3>
-    <textarea rows="3" placeholder="Billing Address"></textarea>
-  </div>
-  <div style="flex: 1;">
-    <h3>Shipping Address</h3>
-    <textarea rows="3" placeholder="Shipping Address"></textarea>
-  </div>
-</div>
+      <div style="flex: 1;">
+        <h3>Customer</h3>
+        <textarea rows="5" placeholder="Customer Address"></textarea>
+      </div>
+      <div style="flex: 1;">
+        <h3>Billing Address</h3>
+        <textarea rows="5" placeholder="Billing Address"></textarea>
+      </div>
+      <div style="flex: 1;">
+        <h3>Shipping Address</h3>
+        <textarea rows="5" placeholder="Shipping Address"></textarea>
+      </div>
+    </div>
 
     <table>
       <thead>
@@ -62,16 +163,16 @@
       <tbody>
         <tr>
           <td>1</td>
-          <td><input type="text" value="E-COMMERCE ACCOUNT MANAGEMENT SERVICES"></td>
-          <td><input type="number" value="15000"></td>
-          <td><input type="number" value="1"></td>
-          <td>15000</td>
-          <td>750</td>
-          <td>15750</td>
+          <td><input type="text" placeholder="Description" oninput="calculate()"></td>
+          <td><input type="number" placeholder="Rate" oninput="calculate()"></td>
+          <td><input type="number" placeholder="Qty" oninput="calculate()"></td>
+          <td class="taxable">0</td>
+          <td class="gst">0</td>
+          <td class="total">0</td>
         </tr>
-        <!-- Add more rows as needed -->
       </tbody>
     </table>
+    <button class="btn-add" onclick="addRow()">+ Add Row</button>
 
     <div class="totals">
       <div>
@@ -81,24 +182,101 @@
         <p><strong>IFSC Code:</strong> SIBL0000753</p>
       </div>
       <div class="totals-right">
-        <p>Taxable INR 15,000.00</p>
-        <p>IGST INR 750.00</p>
-        <p><strong>Total INR 15,750.00</strong></p>
+        <p>Taxable INR 0.00</p>
+        <p>IGST INR 0.00</p>
+        <p><strong>Total INR 0.00</strong></p>
       </div>
     </div>
 
     <div class="amount-in-words">
-      Total in Words: Indian Rupee Fifteen Thousand Seven Hundred Fifty Only
+      Total in Words: 
     </div>
 
     <div class="signatory">
-      For SKSY SELLERFLY ONLINE SOLUTIONS LLP<br><br>
+      For SKSY SELLERFLY ONLINE SOLUTIONS LLP<br><br><br>
       Authorised Signatory
     </div>
 
+    <hr>
     <div class="footer">
       Thank you for your business.
     </div>
+    <hr>
+
+    <button class="btn-download" onclick="downloadPDF()">Download PDF</button>
   </div>
+
+  <!-- html2pdf script CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    window.onload = function () {
+      const today = new Date();
+      const number = `SKSY${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+      document.getElementById('invoiceNumber').value = number;
+    };
+
+    function addRow() {
+      const tbody = document.querySelector("table tbody");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${tbody.children.length + 1}</td>
+        <td><input type="text" placeholder="Description" oninput="calculate()"></td>
+        <td><input type="number" placeholder="Rate" oninput="calculate()"></td>
+        <td><input type="number" placeholder="Qty" oninput="calculate()"></td>
+        <td class="taxable">0</td>
+        <td class="gst">0</td>
+        <td class="total">0</td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function calculate() {
+      let taxableTotal = 0;
+      let gstTotal = 0;
+      let grandTotal = 0;
+
+      document.querySelectorAll("table tbody tr").forEach(row => {
+        const rate = parseFloat(row.querySelector("td:nth-child(3) input")?.value) || 0;
+        const qty = parseFloat(row.querySelector("td:nth-child(4) input")?.value) || 0;
+        const taxable = rate * qty;
+        const gst = taxable * 0.05;
+        const total = taxable + gst;
+
+        row.querySelector(".taxable").innerText = taxable.toFixed(2);
+        row.querySelector(".gst").innerText = gst.toFixed(2);
+        row.querySelector(".total").innerText = total.toFixed(2);
+
+        taxableTotal += taxable;
+        gstTotal += gst;
+        grandTotal += total;
+      });
+
+      document.querySelector(".totals-right").innerHTML = `
+        <p>Taxable INR ${taxableTotal.toFixed(2)}</p>
+        <p>IGST INR ${gstTotal.toFixed(2)}</p>
+        <p><strong>Total INR ${grandTotal.toFixed(2)}</strong></p>
+      `;
+
+      document.querySelector(".amount-in-words").innerText = `Total in Words: ${convertNumberToWords(grandTotal)} Only`;
+    }
+
+    function convertNumberToWords(amount) {
+      if (amount === 0) return "Zero";
+      // Example simple conversion (improve if needed)
+      return `Indian Rupee ${amount.toFixed(2)}`;
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById("invoice");
+      html2pdf().set({
+        margin: 10,
+        filename: 'invoice.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(element).save();
+    }
+  </script>
 </body>
 </html>
