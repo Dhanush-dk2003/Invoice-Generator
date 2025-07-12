@@ -1,345 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <title>Invoice Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sellerfly Invoice Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      color: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background: #f5f7fa;
     }
-    .invoice-box {
-      max-width: 800px;
-      margin: auto;
-      border: 1px solid #eee;
-      padding: 20px;
-      overflow-x: auto;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-    .header img {
-      max-width: 180px;
-    }
-    .company-details {
-      margin-top: 25px;
-      margin-left: 10px;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    .company-details h4 {
-      margin: 0;
-      font-size: 12px;
-    }
-    
-    .invoice-fields {
-  display: flex;
-  flex-direction: column; /* stack vertically */
-  align-items: flex-end;   /* align inputs to the same end */
-  margin-top: 60px;
-}
-.invoice-fields h3 {
-      
-      padding-right: 40px;
-    }
-.invoice-fields label {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  width: 100%;
-}
 
-    .invoice-fields input {
-      border: none;
-      background: transparent;
-      font-size: 14px;
-      width: 140px;
-      border-bottom: 1px solid #ccc;
-      padding: 2px;
+    .container {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
+
+    h2 {
+      border-bottom: 2px solid #96999b;
+      padding-bottom: 5px;
+      color: #010c0f;
+    }
+
+    .section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .section>div {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    input,
     textarea {
       width: 100%;
       padding: 8px;
-      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
       resize: vertical;
     }
+
     table {
       width: 100%;
+      margin-top: 10px;
       border-collapse: collapse;
-      margin-top: 15px;
-      table-layout: fixed;
-      word-wrap: break-word;
     }
-    table, th, td {
-      border: 1px solid #6d6a6a;
-    }
-    th {
-      background-color: #cecece;
+
+    th,
+    td {
+      border: 1px solid #ddd;
       padding: 8px;
-      
-    }
-    th, td {
-      text-align: left;
-      padding: 6px;
-    }
-    th:nth-child(2), td:nth-child(2) {
-      width: 30%;
-    }
-    .totals {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 40px;
-    }
-    .totals-right {
-      text-align: right;
-    }
-   table th:nth-child(1), table td:nth-child(1) { width: 8%; }
-table th:nth-child(2), table td:nth-child(2) { width: 38%; }
-table th:nth-child(3), table td:nth-child(3) { width: 15%; }
-table th:nth-child(4), table td:nth-child(4) { width: 13%; }
-table th:nth-child(5), table td:nth-child(5) { width: 13%; }
-table th:nth-child(6), table td:nth-child(6) { width: 8%; }
-table th:nth-child(7), table td:nth-child(7) { width: 13%; }
-table td input[type="text"],
-table td input[type="number"] {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 4px; /* adjust if needed */
-}
-
-
-    .amount-in-words {
-      border-top: 1px solid #ddd;
-      margin-top: 10px;
-      padding-top: 10px;
-      font-style: italic;
-    }
-    .signatory-title {
-      margin-top: 50px;
-      text-align: right;
-    }
-    .signatory-authority {
-      text-align: right;
-      margin-top: 100px;
-    }
-    .footer {
-      margin-top: 30px;
       text-align: center;
-      font-size: 12px;
-      
     }
-    hr {
-      margin: 20px 0;
+
+    th {
+      background-color: #bdbfc1;
+      color: white;
     }
-    .btn-add {
-      margin-top: 10px;
-      float: right;
+
+    button {
+      padding: 8px 16px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
-    .btn-download {
-      margin-top: 20px;
-      float: right;
+
+    button.add-item-button {
+      background: #96cdf5;
+      font-size: 15px;
+      text-align: center;
+
+    }
+
+    button:hover {
+      background: #217dbb;
     }
   </style>
 </head>
+
 <body>
-  <div class="invoice-box" id="invoice">
-    <div class="header">
+  <div class="container">
+    <h2>Invoice Form</h2>
+    <div class="section">
       <div>
-        <img src="./Assets/Sellerfly.png" alt="Logo" />
-        <div class="company-details">
-          <h4>SKSY SELLERFLY ONLINE SOLUTIONS LLP</h4>
-          Sf.No.434, Shedukarar Street, Ellapalayam,<br>
-          Coimbatore, Mettupalayam,<br>
-          Mettupalayam - 641697<br>
-          TAMILNADU, INDIA<br>
-          Email: senthil.sellerfly@gmail.com<br>
-          Mobile: 6381780309<br>
-          GSTIN: 33AFNFS0333L1ZV
-        </div>
+        <label>Invoice Number</label>
+        <input type="text" id="invoiceNumber" />
       </div>
       <div>
-        
-        <div class="invoice-fields">
-          <h3 id="invoiceTitle">INVOICE</h3>
-          <label>Number: <input type="text" id="invoiceNumber"></label>
-          <label>Date: <input type="date" id="invoiceDate"></label>
-          <label>Due Date: <input type="date" id="invoiceDueDate"></label>
-        </div>
+        <label>Invoice Date</label>
+        <input type="date" id="invoiceDate" />
+      </div>
+      <div>
+        <label>Due Date</label>
+        <input type="date" id="invoiceDueDate" />
+      </div>
+      <div>
+        <label>Status</label>
+        <select id="status">
+          <option value="NOT PAID">NOT PAID</option>
+          <option value="PAID">PAID</option>
+        </select>
+
       </div>
     </div>
 
-    <hr>
-
-    <div style="display: flex; gap: 20px;">
-      <div style="flex: 1;">
-        <h3>Customer</h3>
-        <textarea rows="6" placeholder="Customer Address"></textarea>
+    <div class="section">
+      <div>
+        <label>Customer Details</label>
+        <textarea id="customerDetails" rows="4" placeholder="Name, Phone, Email, GSTIN, POS"></textarea>
       </div>
-      <div style="flex: 1;">
-        <h3>Billing Address</h3>
-        <textarea rows="6" placeholder="Billing Address"></textarea>
+      <div>
+        <label>Billing Address</label>
+        <textarea id="billingAddress" rows="4"></textarea>
       </div>
-      <div style="flex: 1;">
-        <h3>Shipping Address</h3>
-        <textarea rows="6" placeholder="Shipping Address"></textarea>
+      <div>
+        <label>Shipping Address</label>
+        <textarea id="shippingAddress" rows="4"></textarea>
       </div>
     </div>
 
-    <table>
+    <h2>Items</h2>
+    <table id="itemTable">
       <thead>
         <tr>
-          <th>S.No</th>
+          <th>S.No.</th>
           <th>Description</th>
           <th>Rate</th>
-          <th>Quantity</th>
-          <th>Taxable</th>
-          <th>GST 5%</th>
-          <th>Total</th>
+          <th>Qty</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>1</td>
-          <td><input type="text" placeholder="Description" oninput="calculate()"></td>
-          <td><input type="number" placeholder="Rate" oninput="calculate()"></td>
-          <td><input type="number" placeholder="Qty" oninput="calculate()"></td>
-          <td class="taxable">0</td>
-          <td class="gst">0</td>
-          <td class="total">0</td>
+          <td><input type="text" placeholder="Description" style="width: 200px"></td>
+          <td><input type="number" placeholder="Rate" style="width: 130px"></td>
+          <td><input type="number" placeholder="Qty" style="width: 130px"></td>
         </tr>
       </tbody>
     </table>
-    <button class="btn-add" onclick="addRow()">+ Add Row</button>
-
-    <div class="totals">
-      <div>
-        <p><strong>Bank Name:</strong> SOUTH INDIAN BANK</p>
-        <p><strong>Account Name:</strong> SKSY SELLERFLY ONLINE SOLUTIONS LLP</p>
-        <p><strong>Account Number:</strong> 0753073000000635</p>
-        <p><strong>IFSC Code:</strong> SIBL0000753</p>
-      </div>
-      <div class="totals-right">
-        <p>Taxable INR 0.00</p>
-        <p>IGST INR 0.00</p>
-        <p><strong>Total INR 0.00</strong></p>
-      </div>
+    <div style="text-align: right; margin-top: 5px;">
+      <button onclick="addRow()" class="add-item-button">+ Add Item</button>
+    </div>
+    <div style="text-align: center; margin-top: 20px;">
+      <button onclick="generatePDF()">Generate PDF</button>
     </div>
 
-    <div class="amount-in-words">
-      Total in Words: 
-    </div>
+    <script>
+      window.onload = function () {
+        const today = new Date();
+        const number = `SKSY${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+        document.getElementById("invoiceNumber").value = number;
+      };
 
-    <div class="signatory">
-      <p class="signatory-title">For SKSY SELLERFLY ONLINE SOLUTIONS LLP</p>
-      <p class="signatory-authority">Authorised Signatory</p>
-    </div>
+      function addRow() {
+        const table = document.getElementById("itemTable").getElementsByTagName('tbody')[0];
+        const rowCount = table.rows.length + 1;
+        const row = table.insertRow();
+        row.innerHTML = `
+      <td>${rowCount}</td>
+      <td><input type="text" placeholder="Description" style="width: 200px"></td>
+      <td><input type="number" placeholder="Rate" style="width: 130px"></td>
+      <td><input type="number" placeholder="Qty" style="width: 130px"></td>
+    `;
+      }
 
-    <hr>
-    <div class="footer">
-      Thank you for your business.
-    </div>
-    <hr>
+      async function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
 
-    <button class="btn-download" onclick="downloadPDF()">Download PDF</button>
+        // Logo
+        const imgData = './Assets/Sellerfly-min.png';
+        const img = new Image();
+        img.src = imgData;
+        img.onload = () => {
+          doc.addImage(img, 'PNG', 14, 10, 40, 15);
+
+          // Invoice block on right
+          const invoiceNumber = document.getElementById("invoiceNumber").value;
+          const invoiceDate = document.getElementById("invoiceDate").value;
+          const dueDate = document.getElementById("invoiceDueDate").value;
+          const status = document.getElementById("status").value;
+
+          doc.setFontSize(16);
+          doc.setFont(undefined, "bold");
+          doc.text("INVOICE", 190, 30, { align: "right" });
+          doc.setFont(undefined, "normal");
+          doc.setFontSize(10);
+          // Labels left
+          doc.text("Number:", 145, 38);
+          doc.text("Date:", 145, 44);
+          doc.text("Due Date:", 145, 50);
+
+          // Values right
+          doc.text(`${invoiceNumber}`, 190, 38, { align: "right" });
+          doc.text(`${invoiceDate}`, 190, 44, { align: "right" });
+          doc.text(`${dueDate}`, 190, 50, { align: "right" });
+
+
+
+          // Status box
+          doc.setFillColor(status === "PAID" ? 0 : 255, status === "PAID" ? 150 : 0, 0);
+doc.setTextColor(255, 255, 255);
+doc.rect(160, 55, 30, 6, 'F'); // previously 38
+doc.text(status.toUpperCase(), 175, 59, { align: "center" });
+doc.setTextColor(0);
+doc.setFontSize(9);
+
+          // Company details closer
+          let yPos = 30;
+          doc.setFontSize(11);
+          doc.setFont(undefined, "bold");
+          doc.text("SKSY SELLERFLY ONLINE SOLUTIONS LLP", 14, yPos + 5);
+
+          doc.setFont(undefined, "normal");
+          doc.setFontSize(9);
+          doc.text([
+
+            "Sf.No.434, Shedukarar Street, Ellapalayam,",
+            "Coimbatore, Mettupalayam,",
+            "Mettupalayam - 641697, TAMILNADU, INDIA",
+            "Email: senthil.sellerfly@gmail.com",
+            "Mobile: 6381780309",
+            "GSTIN: 33AFNFS0333L1ZV"
+          ], 14, yPos + 10);
+
+          // Divider line
+          doc.line(14, yPos + 35, 196, yPos + 35);
+
+          // Addresses
+          yPos += 45;
+          doc.setFontSize(12);
+          doc.setFont(undefined, "bold");
+          doc.text("Customer", 14, yPos);
+          doc.text("Billing Address", 80, yPos);
+          doc.text("Shipping Address", 150, yPos);
+          doc.setFont(undefined, "normal");
+          doc.setFontSize(10);
+          doc.text(document.getElementById("customerDetails").value.split('\n'), 14, yPos + 5);
+          doc.text(document.getElementById("billingAddress").value.split('\n'), 80, yPos + 5);
+          doc.text(document.getElementById("shippingAddress").value.split('\n'), 150, yPos + 5);
+
+          // Prepare table
+          const rows = [];
+          const table = document.getElementById("itemTable").getElementsByTagName('tbody')[0];
+          let totalTaxable = 0;
+          let gstTotal = 0;
+          let grandTotal = 0;
+
+          for (let i = 0; i < table.rows.length; i++) {
+            const desc = table.rows[i].cells[1].querySelector("input").value + "\nGST: 5%";
+            const rate = parseFloat(table.rows[i].cells[2].querySelector("input").value) || 0;
+            const qty = parseFloat(table.rows[i].cells[3].querySelector("input").value) || 0;
+            const taxable = rate * qty;
+            const gst = taxable * 0.05;
+            const total = taxable + gst;
+
+            totalTaxable += taxable;
+            gstTotal += gst;
+            grandTotal += total;
+
+            rows.push([
+              i + 1,
+              desc,
+              rate.toFixed(2),
+              qty,
+              taxable.toFixed(2),
+              total.toFixed(2),
+            ]);
+          }
+
+          const headers = [["S.No", "Description", "Rate", "Quantity", "Taxable", "Total"]];
+          yPos += 5;
+
+          doc.autoTable({
+            startY: yPos + 30,
+            head: headers,
+            body: rows,
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 3 },
+            headStyles: { fillColor: [189, 191, 193], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+            columnStyles: {
+              0: { cellWidth: 15 },  // S.No
+              1: { cellWidth: 60 },  // Description
+              2: { cellWidth: 28 },  // Rate
+              3: { cellWidth: 20 },  // Qty
+              4: { cellWidth: 28 },  // Taxable
+              5: { cellWidth: 28 }   // Total
+            }
+          });
+
+
+          let finalY = doc.lastAutoTable.finalY + 15;
+
+          // Move bank and total details slightly down
+          doc.setFontSize(10);
+          doc.setFont(undefined, "bold");
+          doc.text("Bank Name:", 14, finalY);
+          doc.text("Account Name:", 14, finalY + 4);
+          doc.text("Account Number:", 14, finalY + 8);
+          doc.text("IFSC Code:", 14, finalY + 12);
+
+          doc.setFont(undefined, "normal");
+          doc.text("SOUTH INDIAN BANK", 47, finalY);
+          doc.text("SKSY SELLERFLY ONLINE SOLUTIONS LLP", 47, finalY + 4);
+          doc.text("0753073000000635", 47, finalY + 8);
+          doc.text("SIBL0000753", 47, finalY + 12);
+
+
+          doc.setFontSize(10);
+          doc.setFont(undefined, "bold");
+          doc.text(`Taxable`, 150, finalY);   
+          doc.text(`IGST`, 150, finalY + 5);
+          doc.text(`Total`, 150, finalY + 10);
+          doc.setFont(undefined, "normal");
+          doc.text(`INR ${totalTaxable.toFixed(2)}`, 165, finalY);
+          doc.text(`INR ${gstTotal.toFixed(2)}`, 165, finalY + 5);
+          doc.text(`INR ${grandTotal.toFixed(2)}`, 165, finalY + 10);
+          finalY += 25;
+
+          // Total in words
+          doc.setFontSize(11);
+          doc.setFont(undefined, "italic");
+          doc.text(`Total in Words: Indian Rupee ${convertNumberToWords(Math.round(grandTotal))} Only`, 196, finalY, { align: "right" });
+
+          finalY += 40;
+
+          // Signature right aligned
+          doc.setFont(undefined, "normal");
+          doc.text("For SKSY SELLERFLY ONLINE SOLUTIONS LLP", 196, finalY, { align: "right" });
+          finalY += 40;
+          doc.text("Authorised Signatory", 196, finalY, { align: "right" });
+
+          // Signature space
+          doc.line(150, finalY - 8, 196, finalY - 8);
+
+          // Footer
+          doc.line(14, 285, 196, 285);
+          doc.text("Thank you for your business.", 105, 290, { align: "center" });
+          // Second line below
+          // doc.line(14, 295, 196, 295);
+          doc.save(`Sellerfly_invoice_${invoiceNumber}.pdf`);
+        };
+      }
+
+      function convertNumberToWords(amount) {
+        const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+          'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+        const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+        if ((amount = amount.toString()).length > 9) return 'Overflow';
+        let n = ('000000000' + amount).substr(-9).match(/.{1,2}/g);
+        let str = '';
+        if (n[0] != 0) str += (a[Number(n[0])] || b[n[0][0]] + ' ' + a[n[0][1]]) + ' Crore ';
+        if (n[1] != 0) str += (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Lakh ';
+        if (n[2] != 0) str += (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Thousand ';
+        if (n[3] != 0) str += (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Hundred ';
+        if (n[4] != 0) str += (str != '' ? 'and ' : '') + (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]);
+        return str.trim();
+      }
+    </script>
+
   </div>
-
-  <!-- html2pdf script CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <script>
-    window.onload = function () {
-      const today = new Date();
-      const number = `SKSY${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-      document.getElementById('invoiceNumber').value = number;
-    };
-
-    function addRow() {
-      const tbody = document.querySelector("table tbody");
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${tbody.children.length + 1}</td>
-        <td><input type="text" placeholder="Description" oninput="calculate()"></td>
-        <td><input type="number" placeholder="Rate" oninput="calculate()"></td>
-        <td><input type="number" placeholder="Qty" oninput="calculate()"></td>
-        <td class="taxable">0</td>
-        <td class="gst">0</td>
-        <td class="total">0</td>
-      `;
-      tbody.appendChild(row);
-    }
-
-    function calculate() {
-      let taxableTotal = 0;
-      let gstTotal = 0;
-      let grandTotal = 0;
-
-      document.querySelectorAll("table tbody tr").forEach(row => {
-        const rate = parseFloat(row.querySelector("td:nth-child(3) input")?.value) || 0;
-        const qty = parseFloat(row.querySelector("td:nth-child(4) input")?.value) || 0;
-        const taxable = rate * qty;
-        const gst = taxable * 0.05;
-        const total = taxable + gst;
-
-        row.querySelector(".taxable").innerText = taxable.toFixed(2);
-        row.querySelector(".gst").innerText = gst.toFixed(2);
-        row.querySelector(".total").innerText = total.toFixed(2);
-
-        taxableTotal += taxable;
-        gstTotal += gst;
-        grandTotal += total;
-      });
-
-      document.querySelector(".totals-right").innerHTML = `
-        <p>Taxable INR ${taxableTotal.toFixed(2)}</p>
-        <p>IGST INR ${gstTotal.toFixed(2)}</p>
-        <p><strong>Total INR ${grandTotal.toFixed(2)}</strong></p>
-      `;
-
-      document.querySelector(".amount-in-words").innerText = `Total in Words: ${convertNumberToWords(Math.round(grandTotal))} Only`;
-    }
-
-    function convertNumberToWords(amount) {
-      const a = [
-        '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
-        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
-      ];
-      const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-      if ((amount = amount.toString()).length > 9) return 'Overflow';
-      let n = ('000000000' + amount).substr(-9).match(/.{1,2}/g);
-      let str = '';
-      if (n[0] != 0) {
-        str += (a[Number(n[0])] || b[n[0][0]] + ' ' + a[n[0][1]]) + ' Crore ';
-      }
-      if (n[1] != 0) {
-        str += (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Lakh ';
-      }
-      if (n[2] != 0) {
-        str += (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Thousand ';
-      }
-      if (n[3] != 0) {
-        str += (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Hundred ';
-      }
-      if (n[4] != 0) {
-        str += (str != '' ? 'and ' : '') + (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + '';
-      }
-      return 'Indian Rupee ' + str.trim();
-    }
-
-    function downloadPDF() {
-      const element = document.getElementById("invoice");
-      html2pdf().set({
-        margin: 10,
-        filename: 'invoice.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(element).save();
-    }
-  </script>
 </body>
+
 </html>
