@@ -14,36 +14,45 @@
       margin: auto;
       border: 1px solid #eee;
       padding: 20px;
+      overflow-x: auto;
     }
     .header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      flex-wrap: wrap;
     }
     .header img {
-      max-width: 120px;
+      max-width: 180px;
     }
     .company-details {
-      margin-top: 10px;
+      margin-top: 25px;
+      margin-left: 10px;
       font-size: 12px;
       line-height: 1.4;
     }
-    .invoice-title h3 {
+    .company-details h4 {
       margin: 0;
+      font-size: 12px;
     }
+    
     .invoice-fields {
-      display: flex;
-      gap: 20px;
-      justify-content: flex-end;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
+  display: flex;
+  flex-direction: column; /* stack vertically */
+  align-items: flex-end;   /* align inputs to the same end */
+  margin-top: 60px;
+}
+.invoice-fields h3 {
+      
+      padding-right: 40px;
     }
-    .invoice-fields label {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+.invoice-fields label {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
     .invoice-fields input {
       border: none;
       background: transparent;
@@ -62,46 +71,77 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
+      table-layout: fixed;
+      word-wrap: break-word;
     }
     table, th, td {
-      border: 1px solid #ddd;
+      border: 1px solid #6d6a6a;
+    }
+    th {
+      background-color: #cecece;
+      padding: 8px;
+      
     }
     th, td {
       text-align: left;
-      padding: 8px;
+      padding: 6px;
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 30%;
     }
     .totals {
       display: flex;
       justify-content: space-between;
-      margin-top: 20px;
+      margin-top: 40px;
     }
     .totals-right {
       text-align: right;
     }
+   table th:nth-child(1), table td:nth-child(1) { width: 8%; }
+table th:nth-child(2), table td:nth-child(2) { width: 38%; }
+table th:nth-child(3), table td:nth-child(3) { width: 15%; }
+table th:nth-child(4), table td:nth-child(4) { width: 13%; }
+table th:nth-child(5), table td:nth-child(5) { width: 13%; }
+table th:nth-child(6), table td:nth-child(6) { width: 8%; }
+table th:nth-child(7), table td:nth-child(7) { width: 13%; }
+table td input[type="text"],
+table td input[type="number"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px; /* adjust if needed */
+}
+
+
     .amount-in-words {
       border-top: 1px solid #ddd;
       margin-top: 10px;
       padding-top: 10px;
       font-style: italic;
     }
-    .signatory {
-      margin-top: 80px;
+    .signatory-title {
+      margin-top: 50px;
       text-align: right;
+    }
+    .signatory-authority {
+      text-align: right;
+      margin-top: 100px;
     }
     .footer {
       margin-top: 30px;
       text-align: center;
       font-size: 12px;
+      
     }
     hr {
       margin: 20px 0;
     }
     .btn-add {
       margin-top: 10px;
+      float: right;
     }
     .btn-download {
       margin-top: 20px;
-      display: block;
+      float: right;
     }
   </style>
 </head>
@@ -122,9 +162,10 @@
         </div>
       </div>
       <div>
-        <h3>INVOICE</h3>
+        
         <div class="invoice-fields">
-          <label>Number: <input type="text" id="invoiceNumber" readonly></label>
+          <h3 id="invoiceTitle">INVOICE</h3>
+          <label>Number: <input type="text" id="invoiceNumber"></label>
           <label>Date: <input type="date" id="invoiceDate"></label>
           <label>Due Date: <input type="date" id="invoiceDueDate"></label>
         </div>
@@ -136,22 +177,22 @@
     <div style="display: flex; gap: 20px;">
       <div style="flex: 1;">
         <h3>Customer</h3>
-        <textarea rows="5" placeholder="Customer Address"></textarea>
+        <textarea rows="6" placeholder="Customer Address"></textarea>
       </div>
       <div style="flex: 1;">
         <h3>Billing Address</h3>
-        <textarea rows="5" placeholder="Billing Address"></textarea>
+        <textarea rows="6" placeholder="Billing Address"></textarea>
       </div>
       <div style="flex: 1;">
         <h3>Shipping Address</h3>
-        <textarea rows="5" placeholder="Shipping Address"></textarea>
+        <textarea rows="6" placeholder="Shipping Address"></textarea>
       </div>
     </div>
 
     <table>
       <thead>
         <tr>
-          <th>S.No.</th>
+          <th>S.No</th>
           <th>Description</th>
           <th>Rate</th>
           <th>Quantity</th>
@@ -193,8 +234,8 @@
     </div>
 
     <div class="signatory">
-      For SKSY SELLERFLY ONLINE SOLUTIONS LLP<br><br><br>
-      Authorised Signatory
+      <p class="signatory-title">For SKSY SELLERFLY ONLINE SOLUTIONS LLP</p>
+      <p class="signatory-authority">Authorised Signatory</p>
     </div>
 
     <hr>
@@ -258,13 +299,35 @@
         <p><strong>Total INR ${grandTotal.toFixed(2)}</strong></p>
       `;
 
-      document.querySelector(".amount-in-words").innerText = `Total in Words: ${convertNumberToWords(grandTotal)} Only`;
+      document.querySelector(".amount-in-words").innerText = `Total in Words: ${convertNumberToWords(Math.round(grandTotal))} Only`;
     }
 
     function convertNumberToWords(amount) {
-      if (amount === 0) return "Zero";
-      // Example simple conversion (improve if needed)
-      return `Indian Rupee ${amount.toFixed(2)}`;
+      const a = [
+        '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+        'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
+      ];
+      const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+      if ((amount = amount.toString()).length > 9) return 'Overflow';
+      let n = ('000000000' + amount).substr(-9).match(/.{1,2}/g);
+      let str = '';
+      if (n[0] != 0) {
+        str += (a[Number(n[0])] || b[n[0][0]] + ' ' + a[n[0][1]]) + ' Crore ';
+      }
+      if (n[1] != 0) {
+        str += (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Lakh ';
+      }
+      if (n[2] != 0) {
+        str += (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Thousand ';
+      }
+      if (n[3] != 0) {
+        str += (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Hundred ';
+      }
+      if (n[4] != 0) {
+        str += (str != '' ? 'and ' : '') + (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + '';
+      }
+      return 'Indian Rupee ' + str.trim();
     }
 
     function downloadPDF() {
