@@ -145,7 +145,8 @@
           <th>S.No.</th>
           <th>Description</th>
           <th>Rate</th>
-          <th>Qty</th>
+          <th>Quantity</th>
+          <th>GST (%)</th>
         </tr>
       </thead>
       <tbody>
@@ -153,7 +154,8 @@
           <td>1</td>
           <td><input type="text" placeholder="Description" style="width: 200px"></td>
           <td><input type="number" placeholder="Rate" style="width: 130px"></td>
-          <td><input type="number" placeholder="Qty" style="width: 130px"></td>
+          <td><input type="number" placeholder="Quantity" style="width: 130px"></td>
+          <td><input type="checkbox"></td>
         </tr>
       </tbody>
     </table>
@@ -170,18 +172,19 @@
         const number = `SKSY${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
         document.getElementById("invoiceNumber").value = number;
       };
-
       function addRow() {
         const table = document.getElementById("itemTable").getElementsByTagName('tbody')[0];
         const rowCount = table.rows.length + 1;
         const row = table.insertRow();
         row.innerHTML = `
-      <td>${rowCount}</td>
-      <td><input type="text" placeholder="Description" style="width: 200px"></td>
-      <td><input type="number" placeholder="Rate" style="width: 130px"></td>
-      <td><input type="number" placeholder="Qty" style="width: 130px"></td>
-    `;
+    <td>${rowCount}</td>
+    <td><input type="text" placeholder="Description" style="width: 200px"></td>
+    <td><input type="number" placeholder="Rate" style="width: 130px"></td>
+    <td><input type="number" placeholder="Quantity" style="width: 130px"></td>
+    <td><input type="checkbox"></td>
+  `;
       }
+
 
       async function generatePDF() {
         const { jsPDF } = window.jspdf;
@@ -219,11 +222,11 @@
 
           // Status box
           doc.setFillColor(status === "PAID" ? 0 : 255, status === "PAID" ? 150 : 0, 0);
-doc.setTextColor(255, 255, 255);
-doc.rect(160, 55, 30, 6, 'F'); // previously 38
-doc.text(status.toUpperCase(), 175, 59, { align: "center" });
-doc.setTextColor(0);
-doc.setFontSize(9);
+          doc.setTextColor(255, 255, 255);
+          doc.rect(160, 55, 30, 6, 'F'); // previously 38
+          doc.text(status.toUpperCase(), 175, 59, { align: "center" });
+          doc.setTextColor(0);
+          doc.setFontSize(9);
 
           // Company details closer
           let yPos = 30;
@@ -267,12 +270,21 @@ doc.setFontSize(9);
           let grandTotal = 0;
 
           for (let i = 0; i < table.rows.length; i++) {
-            const desc = table.rows[i].cells[1].querySelector("input").value + "\nGST: 5%";
+            let desc = table.rows[i].cells[1].querySelector("input").value;
+
             const rate = parseFloat(table.rows[i].cells[2].querySelector("input").value) || 0;
             const qty = parseFloat(table.rows[i].cells[3].querySelector("input").value) || 0;
+            const gstChecked = table.rows[i].cells[4].querySelector("input").checked;
+
             const taxable = rate * qty;
-            const gst = taxable * 0.05;
-            const total = taxable + gst;
+            let gst = 0;
+            let total = taxable;
+
+            if (gstChecked) {
+              gst = taxable * 0.18;
+              total += gst;
+              desc += "\nGST: 18%";
+            }
 
             totalTaxable += taxable;
             gstTotal += gst;
@@ -288,7 +300,10 @@ doc.setFontSize(9);
             ]);
           }
 
-          const headers = [["S.No", "Description", "Rate", "Quantity", "Taxable", "Total"]];
+
+
+
+          const headers = [["S.No", "Description", "Rate", "Qty", "Taxable", "Total"]];
           yPos += 5;
 
           doc.autoTable({
@@ -296,7 +311,7 @@ doc.setFontSize(9);
             head: headers,
             body: rows,
             theme: 'grid',
-            styles: { fontSize: 9, cellPadding: 3,lineColor: [230, 230, 230],lineWidth: 0.3 },
+            styles: { fontSize: 9, cellPadding: 3, lineColor: [230, 230, 230], lineWidth: 0.3 },
             headStyles: { fillColor: [189, 191, 193], textColor: 255, fontSize: 11, fontStyle: 'bold' },
             columnStyles: {
               0: { cellWidth: 15 },  // S.No
@@ -328,7 +343,7 @@ doc.setFontSize(9);
 
           doc.setFontSize(10);
           doc.setFont(undefined, "bold");
-          doc.text(`Taxable`, 150, finalY);   
+          doc.text(`Taxable`, 150, finalY);
           doc.text(`IGST`, 150, finalY + 5);
           doc.text(`Total`, 150, finalY + 10);
           doc.setFont(undefined, "normal");
@@ -377,6 +392,7 @@ doc.setFontSize(9);
         if (n[4] != 0) str += (str != '' ? 'and ' : '') + (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]);
         return str.trim();
       }
+      // <-- Add this closing brace for the script block
     </script>
 
   </div>
